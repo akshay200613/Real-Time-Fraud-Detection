@@ -17,7 +17,7 @@ st.set_page_config(
 import os
 
 # Backend API Configuration
-API_URL = os.getenv("API_URL", "http://localhost:8000")
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 # Inject Custom CSS for premium glassmorphic dark theme
 st.markdown("""
@@ -129,12 +129,12 @@ st.markdown("""
 @st.cache_data(ttl=5)
 def check_backend_status():
     try:
-        response = requests.get(f"{API_URL}/", timeout=3)
+        response = requests.get(f"{API_URL}/", timeout=10)
         if response.status_code == 200:
             data = response.json()
             return True, data.get("pyspark_version", "Active")
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Backend status check failed: {e}")
     return False, None
 
 
