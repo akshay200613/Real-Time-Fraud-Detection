@@ -65,16 +65,20 @@ from src.config import (
 def create_spark_session():
     setup_spark_windows_env()
 
-    spark = (
+    builder = (
         SparkSession.builder
         .appName(APP_NAME)
         .master(MASTER)
         .config("spark.sql.shuffle.partitions", SHUFFLE_PARTITIONS)
         .config("spark.driver.memory", DRIVER_MEMORY)
         .config("spark.executor.memory", EXECUTOR_MEMORY)
-        .getOrCreate()
+        .config("spark.driver.maxResultSize", "256m")
+        .config("spark.ui.enabled", "false")
+        .config("spark.python.worker.reuse", "true")
     )
 
+    spark = builder.getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    return spark
+    return spark
+

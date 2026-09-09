@@ -20,10 +20,13 @@ MODEL_PATH = os.path.join(BASE_DIR, "models")
 
 APP_NAME = "Real-Time Fraud Detection"
 
-MASTER = "local[*]"
+# Dynamic Spark config: use lower memory in containerized/cloud environments (e.g. Render)
+IS_CLOUD = bool(os.environ.get("RENDER") or os.environ.get("CONTAINER") or os.environ.get("PORT"))
 
-SHUFFLE_PARTITIONS = "8"
+MASTER = os.environ.get("SPARK_MASTER", "local[1]" if IS_CLOUD else "local[*]")
 
-DRIVER_MEMORY = "8g"
+SHUFFLE_PARTITIONS = os.environ.get("SPARK_SHUFFLE_PARTITIONS", "2" if IS_CLOUD else "8")
 
-EXECUTOR_MEMORY = "8g"
+DRIVER_MEMORY = os.environ.get("SPARK_DRIVER_MEMORY", "350m" if IS_CLOUD else "4g")
+
+EXECUTOR_MEMORY = os.environ.get("SPARK_EXECUTOR_MEMORY", "350m" if IS_CLOUD else "4g")

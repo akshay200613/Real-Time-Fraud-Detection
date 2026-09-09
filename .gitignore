@@ -43,12 +43,11 @@ derby.log
 logs/
 *.log
 
-# Project-specific data & models (large binaries/datasets should not be in git)
+# Project-specific data (large raw datasets should not be in git)
 data/parquet/
 data/processed/
 data/raw/
-models/random_forest_model/
-models/tree_pipeline/
+
 
 # Environments and Secrets
 .env
