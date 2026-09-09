@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.env
+Dockerfile
+.dockerignore
+render.yaml
+
+# Ignore large raw data files to keep the Docker image small
+data/raw/train_transaction.csv
+data/raw/train_identity.csv
+data/raw/test_transaction.csv
+data/raw/test_identity.csv
+data/raw/sample_submission.csv
+
+# Ignore historical model runs
+models/runs/
+
+# Keep the latest models and metrics
+!models/random_forest_model/
+!models/tree_pipeline/
+!models/metrics.json

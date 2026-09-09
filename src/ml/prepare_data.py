@@ -1,8 +1,17 @@
+"""
+prepare_data.py
+
+Prepares features for:
+  - Logistic Regression: StringIndexer → OneHotEncoder → VectorAssembler → StandardScaler
+  - Tree Models:         StringIndexer → VectorAssembler (trees don't need scaling)
+"""
+
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import (
     StringIndexer,
     OneHotEncoder,
-    VectorAssembler
+    VectorAssembler,
+    StandardScaler
 )
 
 
@@ -15,24 +24,32 @@ class DataPreparation:
         self.exclude = {
             "TransactionID",
             "TransactionDT",
+            "classWeight",
             self.label
         }
 
-        # Low-cardinality categorical columns
+        # Categorical columns for model encoding.
+        # Includes low-cardinality transactional + email domain + identity columns.
+        # All use StringIndexer(handleInvalid="keep") so unseen values at
+        # inference time are handled gracefully.
         self.categorical_cols = [
+            # Core transaction categoricals
             "ProductCD",
             "card4",
             "card6",
-            "M1",
-            "M2",
-            "M3",
-            "M4",
-            "M5",
-            "M6",
-            "M7",
-            "M8",
-            "M9",
-            "DeviceType"
+            # Match columns (binary text flags)
+            "M1", "M2", "M3", "M4", "M5",
+            "M6", "M7", "M8", "M9",
+            # Device
+            "DeviceType",
+            # Email domains — strong fraud signal
+            "P_emaildomain",
+            "R_emaildomain",
+            # Identity columns (low-to-medium cardinality)
+            "id_12", "id_15", "id_16",
+            "id_23", "id_27", "id_28",
+            "id_29", "id_31", "id_35",
+            "id_36", "id_37", "id_38",
         ]
 
     def train_test_split(
@@ -59,7 +76,7 @@ class DataPreparation:
         ]
 
     def _categorical_columns(self, df):
-
+        """Returns only the categorical columns that actually exist in df."""
         return [
             column
             for column in self.categorical_cols
@@ -68,6 +85,7 @@ class DataPreparation:
 
     # -----------------------------
     # Logistic Regression Pipeline
+    # StringIndexer → OHE → VectorAssembler → StandardScaler
     # -----------------------------
 
     def prepare_lr(self, train_df, test_df):
@@ -92,12 +110,20 @@ class DataPreparation:
         assembler = VectorAssembler(
             inputCols=numeric_cols +
                       [f"{c}_vec" for c in categorical_cols],
-            outputCol="features",
+            outputCol="features_raw",
             handleInvalid="keep"
         )
 
+        # StandardScaler — critical for LR convergence with mixed-scale features
+        scaler = StandardScaler(
+            inputCol="features_raw",
+            outputCol="features",
+            withMean=False,    # sparse vector safety (OHE produces sparse)
+            withStd=True
+        )
+
         pipeline = Pipeline(
-            stages=indexers + [encoder, assembler]
+            stages=indexers + [encoder, assembler, scaler]
         )
 
         pipeline_model = pipeline.fit(train_df)
@@ -110,6 +136,8 @@ class DataPreparation:
 
     # -----------------------------
     # Tree Models Pipeline
+    # StringIndexer → VectorAssembler
+    # (Trees don't require scaling; skip OHE and StandardScaler)
     # -----------------------------
 
     def prepare_tree(self, train_df, test_df):

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: fraud-detection-app
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free # or 'starter' depending on your Render account
+    envVars:
+      - key: API_URL
+        value: "http://localhost:8000" # Internally resolves since both run in the same container
+    # Streamlit binds to 8501, Render will route web traffic to the port that binds first, or 8501 if we specify it.
+    # We can also expose both, but Render's free tier exposes 1 port publicly.
+    # In a single container setup on Render, you usually expose the frontend (Streamlit) publicly.
+    # Streamlit will communicate with FastAPI via localhost:8000 internally.

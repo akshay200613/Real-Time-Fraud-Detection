@@ -5,12 +5,11 @@ Handles data extraction and profiling for the
 IEEE-CIS Fraud Detection dataset.
 """
 
-from logging import error
 import os
 from typing import Tuple
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, count, when
 
 from src.config import RAW_DATA
 from src.utils.logger import logger
@@ -166,47 +165,34 @@ class Extract:
 
     @staticmethod
     def missing_report(df: DataFrame):
+        """
+        Generates missing value report using a single Spark aggregation pass.
+        (Replaces the per-column filter+count loop which was O(n x columns) Spark jobs.)
+        """
 
         logger.info("Generating Missing Value Report")
 
         total_rows = df.count()
 
-        report = []
+        # Single-pass aggregation — one Spark job for all columns
+        missing_dict = df.select([
+            count(when(col(c).isNull(), c)).alias(c)
+            for c in df.columns
+        ]).first().asDict()
 
-        for column in df.columns:
+        report = [
+            (col_name, missing, round((missing / total_rows) * 100, 2))
+            for col_name, missing in missing_dict.items()
+        ]
 
-            missing = df.filter(
-                col(column).isNull()
-            ).count()
-
-            percentage = round(
-                (missing / total_rows) * 100,
-                2
-            )
-
-            report.append(
-                (
-                    column,
-                    missing,
-                    percentage
-                )
-            )
-
-        report.sort(
-            key=lambda x: x[2],
-            reverse=True
-        )
+        report.sort(key=lambda x: x[2], reverse=True)
 
         print()
-
         print("-" * 60)
-
         print("Missing Value Report")
-
         print("-" * 60)
 
         for row in report:
-
             print(
                 f"{row[0]:25}"
                 f"{row[1]:10}"

@@ -6,6 +6,9 @@ from src.ml.train_model import FraudModel
 from src.ml.evaluate_model import ModelEvaluator
 from src.ml.hyperparameter import HyperParameterTuning
 from src.ml.predict import FraudPredictor
+from src.ml.metrics_store import save_metrics
+
+from datetime import datetime
 
 
 def main():
@@ -58,33 +61,47 @@ def main():
     print("\n========== MODEL PERFORMANCE ==========\n")
 
     for result in results:
-        print(result)
+        print(f"\n--- {result['Model']} ---")
+        print(f"  Accuracy       : {result['Accuracy']:.4f}")
+        print(f"  ROC-AUC        : {result['ROC_AUC']:.4f}")
+        print(f"  PR-AUC         : {result['PR_AUC']:.4f}")
+        print(f"  Fraud Precision: {result['FraudPrecision']:.4f}")
+        print(f"  Fraud Recall   : {result['FraudRecall']:.4f}")
+        print(f"  Fraud F1       : {result['FraudF1']:.4f}")
+        print(f"  TP={result['TP']}  FP={result['FP']}  FN={result['FN']}  TN={result['TN']}")
+
+    # ----------------------------------
+    # Persist metrics to JSON
+    # ----------------------------------
+
+    save_metrics(results)
+
+    print("\nMetrics saved to models/metrics.json")
 
     # ----------------------------------
     # Hyperparameter Tuning
     # ----------------------------------
 
-    tuner = HyperParameterTuning()
-
-    best_rf = tuner.tune_random_forest(
-        tree_train
-    )
+    best_rf = HyperParameterTuning().tune_random_forest(tree_train)
 
     # ----------------------------------
-    # Save Models
+    # Save Models (latest + timestamped run)
     # ----------------------------------
 
-    best_rf.write().overwrite().save(
-        "models/random_forest_model"
-    )
+    run_id = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
 
-    tree_pipeline.write().overwrite().save(
-        "models/tree_pipeline"
-    )
+    # Save canonical latest (used by API)
+    best_rf.write().overwrite().save("models/random_forest_model")
+    tree_pipeline.write().overwrite().save("models/tree_pipeline")
 
-    print("\n===================================")
-    print(" Project Completed Successfully ")
-    print("===================================\n")
+    # Save versioned run (preserves history across retraining)
+    best_rf.write().overwrite().save(f"models/runs/{run_id}/random_forest_model")
+    tree_pipeline.write().overwrite().save(f"models/runs/{run_id}/tree_pipeline")
+
+    print(f"\n===================================")
+    print(f" Project Completed Successfully")
+    print(f" Run ID: {run_id}")
+    print(f"===================================\n")
 
     spark.stop()
 

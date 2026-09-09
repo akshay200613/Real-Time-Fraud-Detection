@@ -1,0 +1,69 @@
+{
+  "trained_at": "2026-09-09T05:30:25.224866+00:00",
+  "models": [
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.8207,
+      "WeightedPrecision": 0.9598,
+      "WeightedRecall": 0.8207,
+      "WeightedF1": 0.8754,
+      "ROC_AUC": 0.8706,
+      "PR_AUC": 0.4122,
+      "FraudPrecision": 0.1311,
+      "FraudRecall": 0.7491,
+      "FraudF1": 0.2231,
+      "TP": 3042,
+      "FP": 20162,
+      "TN": 93876,
+      "FN": 1019
+    },
+    {
+      "Model": "Decision Tree",
+      "Accuracy": 0.856,
+      "WeightedPrecision": 0.961,
+      "WeightedRecall": 0.856,
+      "WeightedF1": 0.8976,
+      "ROC_AUC": 0.5878,
+      "PR_AUC": 0.2089,
+      "FraudPrecision": 0.1591,
+      "FraudRecall": 0.7444,
+      "FraudF1": 0.2622,
+      "TP": 3023,
+      "FP": 15973,
+      "TN": 98065,
+      "FN": 1038
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.8754,
+      "WeightedPrecision": 0.9622,
+      "WeightedRecall": 0.8754,
+      "WeightedF1": 0.9097,
+      "ROC_AUC": 0.8912,
+      "PR_AUC": 0.5242,
+      "FraudPrecision": 0.182,
+      "FraudRecall": 0.7503,
+      "FraudF1": 0.2929,
+      "TP": 3047,
+      "FP": 13699,
+      "TN": 100339,
+      "FN": 1014
+    },
+    {
+      "Model": "GBT",
+      "Accuracy": 0.8896,
+      "WeightedPrecision": 0.9654,
+      "WeightedRecall": 0.8896,
+      "WeightedF1": 0.919,
+      "ROC_AUC": 0.9251,
+      "PR_AUC": 0.5968,
+      "FraudPrecision": 0.2106,
+      "FraudRecall": 0.805,
+      "FraudF1": 0.3339,
+      "TP": 3269,
+      "FP": 12251,
+      "TN": 101787,
+      "FN": 792
+    }
+  ]
+}
