@@ -75,10 +75,12 @@ def create_spark_session():
         .config("spark.driver.maxResultSize", "256m")
         .config("spark.ui.enabled", "false")
         .config("spark.python.worker.reuse", "true")
+        .config("spark.testing.memory", "471859200") # Bypass PySpark 450MB minimum check in tiny containers
     )
 
     spark = builder.getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
     return spark
+
 

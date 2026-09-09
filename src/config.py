@@ -27,6 +27,9 @@ MASTER = os.environ.get("SPARK_MASTER", "local[1]" if IS_CLOUD else "local[*]")
 
 SHUFFLE_PARTITIONS = os.environ.get("SPARK_SHUFFLE_PARTITIONS", "2" if IS_CLOUD else "8")
 
-DRIVER_MEMORY = os.environ.get("SPARK_DRIVER_MEMORY", "350m" if IS_CLOUD else "4g")
+# PySpark requires a strict minimum of 450MB (471859200 bytes) for driver memory. 
+# Render free tier provides exactly 512MB. We use 460m to satisfy PySpark while avoiding OOM.
+DRIVER_MEMORY = os.environ.get("SPARK_DRIVER_MEMORY", "460m" if IS_CLOUD else "4g")
 
-EXECUTOR_MEMORY = os.environ.get("SPARK_EXECUTOR_MEMORY", "350m" if IS_CLOUD else "4g")
+EXECUTOR_MEMORY = os.environ.get("SPARK_EXECUTOR_MEMORY", "460m" if IS_CLOUD else "4g")
+
