@@ -16,6 +16,13 @@ An end-to-end **Real-Time Fraud Detection System** built using **Apache Spark**,
 - Interactive Streamlit Dashboard
 - Download Prediction Results
 - Modular and Scalable Project Structure
+- **Dockerized Deployment (Render)**
+
+---
+
+## 🚀 Live Demo
+The application is deployed live using Docker on Render.com:
+*(Insert your Render URL here once available, e.g., https://fraud-detection-app-xyz.onrender.com)*
 
 ---
 
@@ -376,7 +383,6 @@ This project provided practical experience in:
 
 - Real-Time Streaming using Spark Structured Streaming
 - Kafka Integration
-- Docker Containerization
 - Kubernetes Deployment
 - AWS Cloud Deployment
 - MLflow Experiment Tracking
