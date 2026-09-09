@@ -20,16 +20,14 @@ MODEL_PATH = os.path.join(BASE_DIR, "models")
 
 APP_NAME = "Real-Time Fraud Detection"
 
-# Dynamic Spark config: use lower memory in containerized/cloud environments (e.g. Render)
-IS_CLOUD = bool(os.environ.get("RENDER") or os.environ.get("CONTAINER") or os.environ.get("PORT"))
+# Dynamic Spark config: use cloud defaults suited for Hugging Face Spaces (16GB RAM)
+IS_CLOUD = bool(os.environ.get("RENDER") or os.environ.get("CONTAINER") or os.environ.get("PORT") or os.environ.get("SPACE_ID"))
 
-MASTER = os.environ.get("SPARK_MASTER", "local[1]" if IS_CLOUD else "local[*]")
+MASTER = os.environ.get("SPARK_MASTER", "local[*]")
 
-SHUFFLE_PARTITIONS = os.environ.get("SPARK_SHUFFLE_PARTITIONS", "2" if IS_CLOUD else "8")
+SHUFFLE_PARTITIONS = os.environ.get("SPARK_SHUFFLE_PARTITIONS", "4" if IS_CLOUD else "8")
 
-# PySpark requires a strict minimum of 450MB (471859200 bytes) for driver memory. 
-# Render free tier provides exactly 512MB. We use 460m to satisfy PySpark while avoiding OOM.
-DRIVER_MEMORY = os.environ.get("SPARK_DRIVER_MEMORY", "460m" if IS_CLOUD else "4g")
+DRIVER_MEMORY = os.environ.get("SPARK_DRIVER_MEMORY", "2g" if IS_CLOUD else "4g")
 
-EXECUTOR_MEMORY = os.environ.get("SPARK_EXECUTOR_MEMORY", "460m" if IS_CLOUD else "4g")
+EXECUTOR_MEMORY = os.environ.get("SPARK_EXECUTOR_MEMORY", "2g" if IS_CLOUD else "4g")
 

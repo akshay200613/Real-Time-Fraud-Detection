@@ -72,10 +72,9 @@ def create_spark_session():
         .config("spark.sql.shuffle.partitions", SHUFFLE_PARTITIONS)
         .config("spark.driver.memory", DRIVER_MEMORY)
         .config("spark.executor.memory", EXECUTOR_MEMORY)
-        .config("spark.driver.maxResultSize", "256m")
+        .config("spark.driver.maxResultSize", "1g")
         .config("spark.ui.enabled", "false")
         .config("spark.python.worker.reuse", "true")
-        .config("spark.testing.memory", "471859200") # Bypass PySpark 450MB minimum check in tiny containers
     )
 
     spark = builder.getOrCreate()

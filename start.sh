@@ -12,7 +12,7 @@ sleep 5
 
 # Start the Streamlit frontend in the foreground
 echo "Starting Streamlit frontend..."
-streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+streamlit run streamlit_app.py --server.port 7860 --server.address 0.0.0.0
 
 # If Streamlit exits, kill the backend as well
 kill $BACKEND_PID
